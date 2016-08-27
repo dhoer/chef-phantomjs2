@@ -1,4 +1,4 @@
-# PhantomJS 2 Cookbook
+# PhantomJS2 Cookbook
 
 [![Cookbook Version](http://img.shields.io/cookbook/v/phantomjs2.svg?style=flat-square)][cookbook]
 [![linux](http://img.shields.io/travis/dhoer/chef-phantomjs2/master.svg?label=linux&style=flat-square)][linux]

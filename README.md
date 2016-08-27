@@ -8,9 +8,9 @@
 [linux]: https://travis-ci.org/dhoer/chef-phantomjs2
 [win]: https://ci.appveyor.com/project/dhoer/chef-phantomjs2
 
-Installs the phantomjs cookbook and necessary packages. 
-This is a fork from https://github.com/customink-webops/phantomjs with support for package installs removed,
-but adds a resource that will allow you to install as many versions of phantomjs as your heart desires.
+Installs phantomjs on both Linux and Windows. Windows path is set (unless link attribute is false) but requires you 
+to reboot the server in order to have it available. So symlink path `#{node['phantomjs']['path']}/phantomjs`
+is created and immediately available after Windows install.
 
 ## Requirements
 
@@ -20,6 +20,7 @@ but adds a resource that will allow you to install as many versions of phantomjs
 
 - CentOS, RedHat, Fedora 
 - Debian, Ubuntu
+- Windows
 
 # Usage
 
@@ -47,8 +48,9 @@ include_recipe 'phantomjs2::default'
 
 ### Attributes
 
-- `node['phantomjs2']['path']` - Location for the download. Default `/usr/local/src`.
-- `node['phantomjs2']['version']` - The version to install. Default `1.9.8`.
+- `node['phantomjs2']['path']` - Location for the download. Default Linux: `/usr/local/src` 
+Windows: `#{ENV['ProgramData']}/phantomjs`.
+- `node['phantomjs2']['version']` - The version to install. Default `2.1.1`.
 - `node['phantomjs2']['checksum']` - The checksum of the download. Default `nil`.
 - `node['phantomjs2']['base_url']` - The base URL to download from. 
 Default `https://bitbucket.org/ariya/phantomjs/downloads`.
@@ -69,7 +71,8 @@ Default `https://bitbucket.org/ariya/phantomjs/downloads`.
 - `base_url` - The base URL to download from. Default `node['phantomjs2']['base_url']`.
 - `basename` - The name of the file to download (this is automatically calculated from
 the phantomjs version and kernel type). Default `phantomjs-#{version}-linux-#{node['kernel']['machine']}`.
-- `link` - Link executable to path.  Default `true`.
+- `link` - Link executable to path.  Note that Windows path is set (unless link is false) but requires you 
+to reboot the server in order to have it available. Default `true`.
 - `user` - The user name. Default `root`.
 - `group` - The group name. Default `root`.
 

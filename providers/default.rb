@@ -23,11 +23,11 @@ action :install do
 
   new_resource.packages.each { |name| package name } unless platform?('windows')
 
-  if platform?('windows')
-    executable = "#{new_resource.path}/#{new_resource.basename}/phantomjs.exe"
-  else
-    executable = "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs"
-  end
+  executable = if platform?('windows')
+                 "#{new_resource.path}/#{new_resource.basename}/phantomjs.exe"
+               else
+                 "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs"
+               end
   extension = platform?('windows') ? 'zip' : 'tar.bz2'
   download_path = "#{new_resource.path}/#{new_resource.basename}.#{extension}"
 
@@ -67,7 +67,7 @@ action :install do
     # 2.x has bin directory but 1.x does not
     env 'PATH' do
       delim ::File::PATH_SEPARATOR
-      value (new_resource.version.split('.')[0].to_i > 1) ? '%PHANTOMJS_HOME%/bin' : '%PHANTOMJS_HOME%'
+      value new_resource.version.split('.')[0].to_i > 1 ? '%PHANTOMJS_HOME%/bin' : '%PHANTOMJS_HOME%'
       only_if { new_resource.link }
       action :modify
     end

@@ -21,12 +21,9 @@ platforms:
     image: centos:5
     platform: rhel
     run_command: /sbin/init
-    provision_command:
-      - /usr/bin/yum install -y initscripts net-tools wget which
+    intermediate_instructions:
+      - RUN yum -y install which initscripts net-tools wget
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.7'
 
 - name: centos-6
   driver:
@@ -34,9 +31,6 @@ platforms:
     intermediate_instructions:
       - RUN yum -y install tar which initscripts
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.7'
 
 - name: centos-7
   driver:
@@ -46,9 +40,6 @@ platforms:
       - RUN yum -y install net-tools lsof which
     pid_one_command: /usr/lib/systemd/systemd
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.7'
 
 - name: debian-7
   driver:
@@ -58,9 +49,6 @@ platforms:
       - RUN /usr/bin/apt-get update
       - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.5'
 
 - name: debian-8
   driver:
@@ -70,9 +58,6 @@ platforms:
       - RUN /usr/bin/apt-get update
       - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.5'
 
 - name: fedora-24
   driver:
@@ -83,9 +68,6 @@ platforms:
     intermediate_instructions:
       - RUN yum -y install tar yum which
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.7'
 
 - name: ubuntu-12.04
   driver:
@@ -95,9 +77,6 @@ platforms:
       - RUN /usr/bin/apt-get update
       - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.5'
 
 - name: ubuntu-14.04
   driver:
@@ -107,9 +86,6 @@ platforms:
       - RUN /usr/bin/apt-get update
       - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.6'
 
 - name: ubuntu-16.04
   driver:
@@ -119,9 +95,6 @@ platforms:
       - RUN /usr/bin/apt-get update
       - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
   attributes:
-    flywaydb_test:
-      mysql:
-        version: '5.7'
 
 suites:
 - name: default

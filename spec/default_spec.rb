@@ -32,21 +32,14 @@ describe 'phantomjs2::default' do
 
   it 'notifies the execute resource' do
     resource = chef_run.remote_file('/src/phantomjs-1.0.0-linux-x86_64.tar.bz2')
-    expect(resource).to notify('execute[tar -xvjf /src/phantomjs-1.0.0-linux-x86_64.tar.bz2]').to(:run).immediately
+    expect(resource).to notify('execute[untar phantomjs-1.0.0-linux-x86_64.tar.bz2]').to(:run).immediately
   end
 
   it 'extracts the binary' do
     expect(chef_run).to_not run_execute('tar -xvjf /src/phantomjs-1.0.0-linux-x86_64.tar.bz2')
   end
 
-  it 'notifies the link' do
-    resource = chef_run.execute('tar -xvjf /src/phantomjs-1.0.0-linux-x86_64.tar.bz2')
-    expect(resource).to notify(
-      'link[phantomjs-link /src/phantomjs-1.0.0-linux-x86_64/bin/phantomjs]'
-    ).to(:create).immediately
-  end
-
   it 'creates the symlink' do
-    expect(chef_run).to_not create_link('phantomjs-link /src/phantomjs-1.0.0-linux-x86_64/bin/phantomjs')
+    expect(chef_run).to create_link('phantomjs-link /src/phantomjs-1.0.0-linux-x86_64/bin/phantomjs')
   end
 end

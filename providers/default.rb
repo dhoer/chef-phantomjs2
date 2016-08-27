@@ -15,6 +15,7 @@ action :install do
   return Chef::Log.warn("Platform #{node['platform']} is not supported!") if platform?('mac_os_x', 'windows')
 
   directory new_resource.path do
+    recursive true
     mode '0755'
     owner new_resource.user
     group new_resource.group

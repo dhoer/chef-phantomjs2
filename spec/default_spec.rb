@@ -19,6 +19,7 @@ describe 'phantomjs2::default' do
   it 'installs packages' do
     expect(chef_run).to install_package('fontconfig')
     expect(chef_run).to install_package('freetype')
+    expect(chef_run).to install_package('bzip2')
   end
 
   it 'downloads the tarball' do

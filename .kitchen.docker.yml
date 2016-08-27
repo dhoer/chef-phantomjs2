@@ -59,15 +59,12 @@ platforms:
       - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
   attributes:
 
-- name: fedora-24
+- name: fedora-latest
   driver:
-    image: fedora:24
-    intermediate_instructions:
-    - RUN yum clean all
+    image: fedora:latest
     pid_one_command: /usr/lib/systemd/systemd
     intermediate_instructions:
-      - RUN yum -y install tar yum which
-  attributes:
+      - RUN dnf -y install yum which systemd-sysv initscripts
 
 - name: ubuntu-12.04
   driver:

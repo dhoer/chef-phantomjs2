@@ -126,5 +126,5 @@ platforms:
 suites:
 - name: default
   run_list:
-    - phantomjs
+    - phantomjs2
   attributes:

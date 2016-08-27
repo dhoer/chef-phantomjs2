@@ -17,7 +17,5 @@ platforms:
 suites:
   - name: default
     run_list:
-      - java_se
-      - ghostdriver_test::selenium
-      - ghostdriver_test::standalone
+      - phantomjs2
     attributes:

@@ -17,40 +17,59 @@ action :install do
   directory new_resource.path do
     recursive true
     mode '0755'
-    owner new_resource.user
-    group new_resource.group
+    owner new_resource.user unless platform?('windows')
+    group new_resource.group unless platform?('windows')
   end
 
   new_resource.packages.each { |name| package name } unless platform?('windows')
 
-  executable = "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs"
+  executable = "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs#{platform?('windows') ? '.zip' : ''}"
+  extension = platform?('windows') ? 'zip' : 'tar.bz2'
+  download_path = "#{new_resource.path}/#{new_resource.basename}.#{extension}"
 
-  remote_file "#{new_resource.path}/#{new_resource.basename}.tar.bz2" do
-    owner new_resource.user
-    group new_resource.group
+  remote_file download_path do
+    owner new_resource.user unless platform?('windows')
+    group new_resource.group unless platform?('windows')
     mode '0644'
     backup false
     retries 300
     source "#{new_resource.base_url}/#{new_resource.basename}.tar.bz2"
     checksum new_resource.checksum if new_resource.checksum
     not_if { ::File.exist?(executable) && version_installed?(executable) }
-    notifies(
-      :run, "execute[tar -xvjf #{new_resource.path}/#{new_resource.basename}.tar.bz2]", :immediately
-    ) unless platform?('windows')
+    notifies :run, "execute[untar #{new_resource.basename}.tar.bz2]", :immediately unless platform?('windows')
+    notifies :run, "batch[unzip #{new_resource.basename}.zip]", :immediately if platform?('windows')
   end
 
-  execute "tar -xvjf #{new_resource.path}/#{new_resource.basename}.tar.bz2" do
-    cwd new_resource.path
-    action :nothing
-    notifies :create, "link[phantomjs-link #{executable}]", :immediately
-  end
+  if platform?('windows')
+    powershell_script "unzip #{new_resource.basename}.zip" do
+      code "Add-Type -A 'System.IO.Compression.FileSystem';" \
+        " [IO.Compression.ZipFile]::ExtractToDirectory('#{download_path}', '#{new_resource.path}');"
+      action :nothing
+      notifies(:modify, "env[add #{new_resource.path}/#{new_resource.basename} to PATH]", :immediately)
+    end
 
-  link "phantomjs-link #{executable}" do
-    target_file '/usr/local/bin/phantomjs'
-    to executable
-    owner new_resource.user
-    group new_resource.group
-    action :nothing
-    only_if { new_resource.link }
+    env "phantomjs-path #{new_resource.path}/#{new_resource.basename}/bin" do
+      key_name 'PATH'
+      action :nothing
+      delim ::File::PATH_SEPARATOR
+      value "#{new_resource.path}/#{new_resource.basename}/bin"
+      only_if { new_resource.link }
+    end
+  else
+    execute "untar #{new_resource.basename}.tar.bz2" do
+      command "tar -xvjf #{new_resource.path}/#{new_resource.basename}.tar.bz2"
+      cwd new_resource.path
+      action :nothing
+      notifies :create, "link[phantomjs-link #{executable}]", :immediately
+    end
+
+    link "phantomjs-link #{executable}" do
+      target_file '/usr/local/bin/phantomjs'
+      to executable
+      owner new_resource.user
+      group new_resource.group
+      action :nothing
+      only_if { new_resource.link }
+    end
   end
 end

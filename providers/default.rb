@@ -16,7 +16,7 @@ action :install do
 
   directory new_resource.path do
     recursive true
-    mode '0755' new_resource.user unless platform?('windows')
+    mode '0755' unless platform?('windows')
     owner new_resource.user unless platform?('windows')
     group new_resource.group unless platform?('windows')
   end
@@ -30,7 +30,7 @@ action :install do
   remote_file download_path do
     owner new_resource.user unless platform?('windows')
     group new_resource.group unless platform?('windows')
-    mode '0644' new_resource.user unless platform?('windows')
+    mode '0644' unless platform?('windows')
     backup false
     retries 300
     source "#{new_resource.base_url}/#{new_resource.basename}.#{extension}"

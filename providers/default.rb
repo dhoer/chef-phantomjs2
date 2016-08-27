@@ -32,11 +32,12 @@ action :install do
     source "#{new_resource.base_url}/#{new_resource.basename}.tar.bz2"
     checksum new_resource.checksum if new_resource.checksum
     not_if { ::File.exist?(executable) && version_installed?(executable) }
-    notifies :run, 'execute[phantomjs-install]', :immediately unless platform?('windows')
+    notifies(
+      :run, "execute[tar -xvjf #{new_resource.path}/#{new_resource.basename}.tar.bz2]", :immediately
+    ) unless platform?('windows')
   end
 
-  execute 'phantomjs-install' do
-    command "tar -xvjf #{new_resource.path}/#{new_resource.basename}.tar.bz2"
+  execute "tar -xvjf #{new_resource.path}/#{new_resource.basename}.tar.bz2" do
     cwd new_resource.path
     action :nothing
     notifies :create, "link[phantomjs-link #{executable}]", :immediately

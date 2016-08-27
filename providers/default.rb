@@ -37,7 +37,7 @@ action :install do
     checksum new_resource.checksum if new_resource.checksum
     not_if { ::File.exist?(executable) && version_installed?(executable) }
     notifies :run, "execute[untar #{new_resource.basename}.tar.bz2]", :immediately unless platform?('windows')
-    notifies :run, "batch[unzip #{new_resource.basename}.zip]", :immediately if platform?('windows')
+    notifies :run, "powershell_script[unzip #{new_resource.basename}.zip]", :immediately if platform?('windows')
   end
 
   if platform?('windows')

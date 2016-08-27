@@ -51,14 +51,15 @@ action :install do
     env 'PHANTOMJS_HOME' do
       value "#{new_resource.path}/#{new_resource.basename}"
       only_if { new_resource.link }
-      notifies(:modify, "env[PATH]", :immediately)
+      action :nothing
+      notifies(:modify, 'env[PATH]', :immediately)
     end
 
     env 'PATH' do
-      action :nothing
       delim ::File::PATH_SEPARATOR
-      value "${PHANTOMJS_HOME}/bin"
+      value '${PHANTOMJS_HOME}/bin'
       only_if { new_resource.link }
+      action :nothing
     end
   else
     execute "untar #{new_resource.basename}.tar.bz2" do

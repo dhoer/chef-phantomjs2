@@ -5,11 +5,11 @@ default['phantomjs2']['path'] = platform?('windows') ? "#{ENV['SYSTEMDRIVE']}/ph
 
 case node['platform_family']
 when 'debian'
-  default['phantomjs2']['packages'] = %w(fontconfig libfreetype6)
+  default['phantomjs2']['packages'] = %w(fontconfig libfreetype6 bzip2)
 when 'gentoo'
   default['phantomjs2']['packages'] = ['media-libs/fontconfig', 'media-libs/freetype']
 when 'rhel', 'fedora'
-  default['phantomjs2']['packages'] = %w(fontconfig freetype)
+  default['phantomjs2']['packages'] = %w(fontconfig freetype bzip2)
 else
   default['phantomjs2']['packages'] = []
 end

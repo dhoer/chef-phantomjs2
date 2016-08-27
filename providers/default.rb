@@ -12,7 +12,7 @@ def version_installed?(executable)
 end
 
 action :install do
-  return Chef::Log.warn("Platform #{node['platform']} is not supported!") if platform?('mac_os_x', 'windows')
+  return Chef::Log.warn("Platform #{node['platform']} is not supported!") if platform?('mac_os_x')
 
   directory new_resource.path do
     recursive true
@@ -45,14 +45,19 @@ action :install do
       code "Add-Type -A 'System.IO.Compression.FileSystem';" \
         " [IO.Compression.ZipFile]::ExtractToDirectory('#{download_path}', '#{new_resource.path}');"
       action :nothing
-      notifies(:modify, "env[add #{new_resource.path}/#{new_resource.basename} to PATH]", :immediately)
+      notifies(:create, 'env[PHANTOMJS_HOME]', :immediately)
     end
 
-    env "phantomjs-path #{new_resource.path}/#{new_resource.basename}/bin" do
-      key_name 'PATH'
+    env 'PHANTOMJS_HOME' do
+      value "#{new_resource.path}/#{new_resource.basename}"
+      only_if { new_resource.link }
+      notifies(:modify, "env[PATH]", :immediately)
+    end
+
+    env 'PATH' do
       action :nothing
       delim ::File::PATH_SEPARATOR
-      value "#{new_resource.path}/#{new_resource.basename}/bin"
+      value "${PHANTOMJS_HOME}/bin"
       only_if { new_resource.link }
     end
   else

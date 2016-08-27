@@ -1,7 +1,7 @@
 default['phantomjs2']['version'] = '1.9.8'
 default['phantomjs2']['base_url'] = 'https://bitbucket.org/ariya/phantomjs/downloads'
 default['phantomjs2']['checksum'] = nil
-default['phantomjs2']['path'] = platform?('windows') ? "#{ENV['SYSTEMDRIVE']}/ProgramData" : '/usr/local/src'
+default['phantomjs2']['path'] = platform?('windows') ? ENV['ProgramData'] : '/usr/local/src'
 
 case node['platform_family']
 when 'debian'

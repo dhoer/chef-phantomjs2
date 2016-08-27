@@ -29,7 +29,7 @@ action :install do
     group new_resource.group
     mode '0644'
     backup false
-    retries 10
+    retries 10000
     source "#{new_resource.base_url}/#{new_resource.basename}.tar.bz2"
     checksum new_resource.checksum if new_resource.checksum
     not_if { ::File.exist?(executable) && version_installed?(executable) }

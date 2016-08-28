@@ -4,8 +4,25 @@ def whyrun_supported?
   true
 end
 
-def version_installed?(executable)
-  cmd = Mixlib::ShellOut.new("#{executable} --version")
+# Windows 2.x has bin directory but 1.x does not
+def win_bin?
+  new_resource.version.split('.')[0].to_i > 1
+end
+
+def executable
+  if platform?('windows')
+    if win_bin?
+      "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs.exe"
+    else
+      "#{new_resource.path}/#{new_resource.basename}/phantomjs.exe"
+    end
+  else
+    "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs"
+  end
+end
+
+def version_installed?
+  cmd = Mixlib::ShellOut.new("#{executable} -v")
   cmd.run_command
   cmd.error!
   cmd.stdout.chomp == new_resource.version
@@ -23,11 +40,6 @@ action :install do
 
   new_resource.packages.each { |name| package name } unless platform?('windows')
 
-  executable = if platform?('windows')
-                 "#{new_resource.path}/#{new_resource.basename}/phantomjs.exe"
-               else
-                 "#{new_resource.path}/#{new_resource.basename}/bin/phantomjs"
-               end
   extension = platform?('windows') ? 'zip' : 'tar.bz2'
   download_path = "#{new_resource.path}/#{new_resource.basename}.#{extension}"
 
@@ -39,7 +51,7 @@ action :install do
     retries 300 # bitbucket can throw a lot of 403 Forbidden errors before finally downloading
     source "#{new_resource.base_url}/#{new_resource.basename}.#{extension}"
     checksum new_resource.checksum if new_resource.checksum
-    not_if { ::File.exist?(executable) && version_installed?(executable) }
+    not_if { ::File.exist?(executable) && version_installed? }
     notifies :run, "execute[untar #{new_resource.basename}.tar.bz2]", :immediately unless platform?('windows')
     notifies :run, "powershell_script[unzip #{new_resource.basename}.zip]", :immediately if platform?('windows')
   end
@@ -64,10 +76,9 @@ action :install do
       action :create
     end
 
-    # 2.x has bin directory but 1.x does not
     env 'PATH' do
       delim ::File::PATH_SEPARATOR
-      value new_resource.version.split('.')[0].to_i > 1 ? '%PHANTOMJS_HOME%/bin' : '%PHANTOMJS_HOME%'
+      value win_bin? ? '%PHANTOMJS_HOME%/bin' : '%PHANTOMJS_HOME%'
       only_if { new_resource.link }
       action :modify
     end
